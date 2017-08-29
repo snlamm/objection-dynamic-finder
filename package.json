@@ -1,0 +1,33 @@
+{
+	"name": "objection-dynamic-finder",
+	"version": "0.0.1",
+	"main": "index.js",
+	"author": "Shmuel Lamm (@snlamm)",
+	"license": "MIT",
+	"engines": {
+		"node": ">=6.0.0"
+	},
+	"devDependencies": {
+		"ava": "^0.22.0",
+		"babel-cli": "^6.26.0",
+		"babel-eslint": "^7.2.3",
+		"babel-preset-env": "^1.6.0",
+		"babel-register": "^6.26.0",
+		"eslint": "^4.5.0",
+		"eslint-config-grind": "^2.0.0",
+		"knex": "^0.13.0",
+		"objection": "^0.8.8",
+		"sqlite3": "^3.1.9"
+	},
+	"scripts": {
+		"lint": "eslint index.js",
+		"test": "ava --verbose"
+	},
+	"ava": {
+		"require": [
+			"babel-register",
+			"babel-polyfill"
+		],
+		"babel": "inherit"
+	}
+}

@@ -1,0 +1,13 @@
+{
+	"parser": "babel-eslint",
+	"env": {
+		"node": true
+	},
+	"extends": "grind",
+	"parserOptions": {
+		"sourceType": "module"
+	},
+	"rules": {
+		"no-console": [ "error" ]
+	}
+}
