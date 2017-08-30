@@ -14,8 +14,10 @@
 	},
 	"devDependencies": {
 		"ava": "^0.22.0",
+		"coveralls": "^2.13.1",
 		"eslint": "^4.5.0",
 		"knex": "^0.13.0",
+		"nyc": "^11.1.0",
 		"objection": "^0.8.8",
 		"sqlite3": "^3.1.9"
 	},
@@ -32,6 +34,8 @@
 	],
 	"scripts": {
 		"lint": "eslint index.js",
-		"test": "ava --verbose"
+		"test": "ava --verbose",
+		"test-nyc": "nyc ava --verbose",
+		"coverage": "nyc report --reporter=text-lcov | coveralls"
 	}
 }
