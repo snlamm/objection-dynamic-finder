@@ -2,6 +2,7 @@
 
 <a href="https://travis-ci.org/snlamm/objection-dynamic-finder"><img src="https://travis-ci.org/snlamm/objection-dynamic-finder.svg?branch=master" alt="Build Status"></a>
 <a href='https://coveralls.io/github/snlamm/objection-dynamic-finder?branch=master'><img src='https://coveralls.io/repos/github/snlamm/objection-dynamic-finder/badge.svg?branch=master' alt='Coverage Status' /></a>
+<a href="https://www.npmjs.com/package/objection-dynamic-finder"><img src="https://img.shields.io/gemnasium/mathiasbynens/he.svg" alt="Dependencies"></a>
 <a href="https://www.npmjs.com/package/objection-dynamic-finder"><img src="https://img.shields.io/npm/v/objection-dynamic-finder.svg" alt="NPM Version"></a>
 <a href="https://www.npmjs.com/package/objection-dynamic-finder"><img src="https://img.shields.io/npm/l/objection-dynamic-finder.svg" alt="License"></a>
 
