@@ -11,6 +11,8 @@ module.exports = Model => {
 				let whereTerm = 'where'
 				let offsetLetter = ''
 				let argCount = 0
+				const schema = this._modelClass.$$jsonSchema || this._modelClass.jsonSchema
+				const hasSchema = schema && schema.properties
 
 				// For queryStrings that end in 'OrFail', fail if no models are found ex. firstNameOrFail
 				if(queryString.slice(-6) === 'OrFail') {
@@ -20,7 +22,7 @@ module.exports = Model => {
 
 				// Test for beginning 'or' statement ex. orFirstname
 				if(/^or[A-Z]/.test(queryString)) {
-					queryString = queryString.slice(2)
+					queryString = queryString[2].toLowerCase() + queryString.slice(3)
 					whereTerm = 'orWhere'
 				}
 
@@ -36,8 +38,18 @@ module.exports = Model => {
 						continue
 					}
 
-					// Parse out field to search on and convert from camelCase to snake_case
-					const searchField = (offsetLetter + term).replace(/(.)([A-Z])/, '$1_$2').toLowerCase()
+					// Convert query string from camelCase to snake_case
+					const cameled = (offsetLetter.toLowerCase() + term)
+					const searchField = cameled.replace(/(.)([A-Z])/, '$1_$2').toLowerCase()
+
+					// If a jsonSchema is defined on the model, use it to validate that the queried fields exist
+					if(hasSchema) {
+						if((schema.properties[searchField] === void 0) && (schema.properties[cameled] === void 0)) {
+							throw new Model.NotFoundError(`
+								Querying invalid field: ${searchField}. Please fix the query or update your jsonSchema.
+								`)
+						}
+					}
 
 					// Add the where() query
 					this[whereTerm](searchField, args[argCount ++])
