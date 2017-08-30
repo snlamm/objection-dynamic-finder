@@ -17,6 +17,17 @@ class Person extends Finder(Model) {
 	static get tableName() {
 		return 'persons'
 	}
+
+	static get jsonSchema() {
+		return {
+			properties: {
+				id: { type: 'integer' },
+				firstName: { type: 'string' },
+				lastName: { type: 'string' },
+				email: { type: 'string' }
+			}
+		}
+	}
 }
 
 test('Using a single field', async t => {
@@ -71,6 +82,17 @@ test('Find or fail', async t => {
 	}
 })
 
+test('Querying on a non-existing field fails', async t => {
+
+	try {
+		await Person.query().finder.asdfead('Jane')
+		t.fail()
+	} catch(err) {
+		t.is(err.message, 'NotFoundError')
+		t.is(err.data.trim(), 'Querying invalid field: asdfead. Please fix the query or update your jsonSchema.')
+	}
+})
+
 test('Continue chaining queries on top of finder', async t => {
 	const person = await Person.query().finder.firstName('Jane').where('last_name', 'Quincy').first()
 
@@ -83,13 +105,12 @@ test.before(async() => {
 		table.string('first_name')
 		table.string('last_name')
 		table.string('email')
-		table.integer('company_id')
 	})
 
 	await db('persons').delete()
 	await Person.query().insert({ first_name: 'John', last_name: 'Smith', email: 'john.smith@xyz.com' })
 	await Person.query().insert({ first_name: 'John', last_name: 'Adams', email: 'john.adam@xyz.com' })
-	return Person.query().insert({ first_name: 'Jane', last_name: 'Quincy', email: 'jane@ccc.com', company_id: 3 })
+	return Person.query().insert({ first_name: 'Jane', last_name: 'Quincy', email: 'jane@ccc.com' })
 })
 
 test.after(async() => {
