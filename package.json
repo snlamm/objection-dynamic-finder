@@ -1,41 +1,41 @@
 {
-	"name": "objection-dynamic-finder",
-	"version": "0.1.0",
-	"description": "Dynamic finders for Objection.js",
-	"main": "index.js",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/snlamm/objection-dynamic-finder.git"
-	},
-	"author": "Shmuel Lamm (@snlamm)",
-	"license": "MIT",
-	"engines": {
-		"node": ">=6.0.0"
-	},
-	"devDependencies": {
-		"ava": "^0.22.0",
-		"coveralls": "^2.13.1",
-		"eslint": "^4.5.0",
-		"knex": "^0.13.0",
-		"nyc": "^11.1.0",
-		"objection": "^0.8.8",
-		"sqlite3": "^3.1.9"
-	},
-	"keywords": [
-		"objection",
-		"objectionjs",
-		"dynamic-finders",
-		"dynamic",
-		"finders",
-		"orm",
-		"plugin",
-		"plugins",
-		"findby"
-	],
-	"scripts": {
-		"lint": "eslint index.js",
-		"test": "ava --verbose",
-		"test-nyc": "nyc ava --verbose",
-		"coverage": "nyc report --reporter=text-lcov | coveralls"
-	}
+  "name": "objection-dynamic-finder",
+  "version": "0.1.1",
+  "description": "Dynamic finders for Objection.js",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/snlamm/objection-dynamic-finder.git"
+  },
+  "author": "Shmuel Lamm (@snlamm)",
+  "license": "MIT",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "devDependencies": {
+    "ava": "^0.22.0",
+    "coveralls": "^2.13.1",
+    "eslint": "^4.5.0",
+    "knex": "^0.13.0",
+    "nyc": "^11.1.0",
+    "objection": "^0.8.8",
+    "sqlite3": "^3.1.9"
+  },
+  "keywords": [
+    "objection",
+    "objectionjs",
+    "dynamic-finders",
+    "dynamic",
+    "finders",
+    "orm",
+    "plugin",
+    "plugins",
+    "findby"
+  ],
+  "scripts": {
+    "lint": "eslint index.js",
+    "test": "ava --verbose",
+    "test-nyc": "nyc ava --verbose",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
+  }
 }
