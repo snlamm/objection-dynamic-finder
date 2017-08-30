@@ -1,7 +1,12 @@
 {
 	"name": "objection-dynamic-finder",
 	"version": "0.1.0",
+	"description": "Dynamic finders for Objection.js",
 	"main": "index.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/snlamm/objection-dynamic-finder.git"
+	},
 	"author": "Shmuel Lamm (@snlamm)",
 	"license": "MIT",
 	"engines": {
@@ -14,6 +19,17 @@
 		"objection": "^0.8.8",
 		"sqlite3": "^3.1.9"
 	},
+	"keywords": [
+		"objection",
+		"objectionjs",
+		"dynamic-finders",
+		"dynamic",
+		"finders",
+		"orm",
+		"plugin",
+		"plugins",
+		"findby"
+	],
 	"scripts": {
 		"lint": "eslint index.js",
 		"test": "ava --verbose"
