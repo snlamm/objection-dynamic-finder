@@ -1,7 +1,7 @@
-import test from 'ava'
-import knex from 'knex'
-import { Model } from 'objection'
-import Finder from '../index.js'
+const test = require('ava')
+const knex = require('knex')
+const Model = require('objection').Model
+const Finder = require('../index.js')
 
 // create knex connection to database
 const db = knex({
@@ -30,62 +30,63 @@ class Person extends Finder(Model) {
 	}
 }
 
-test('Using a single field', async t => {
-	const persons = await Person.query().finder.firstName('John')
-
-	t.is(persons[0].first_name, 'John')
+test('Using a single field', t => {
+	return Person.query().finder.firstName('John').then(persons => {
+		t.is(persons[0].first_name, 'John')
+	})
 })
 
-test('Using multiple fields with "and"', async t => {
-	const persons = await Person.query().finder.firstNameAndLastName('John', 'Smith')
-
-	t.is(persons.length, 1)
-	t.is(persons[0].last_name, 'Smith')
+test('Using multiple fields with "and"', t => {
+	return Person.query().finder.firstNameAndLastName('John', 'Smith').then(persons => {
+		t.is(persons.length, 1)
+		t.is(persons[0].last_name, 'Smith')
+	})
 })
 
-test('Using multiple fields with "or"', async t => {
-	const persons = await Person.query().finder.firstNameAndEmailOrLastName('Jane', 'jane@ccc.com', 'Adams')
-	const person = await Person.query().finder.firstNameAndEmailOrLastName('Jane', 'john.adam@xyz.com', 'Adams')
+test('Using multiple fields with "or"', t => {
+	return Promise.all([
+		Person.query().finder.firstNameAndEmailOrLastName('Jane', 'jane@ccc.com', 'Adams'),
+		Person.query().finder.firstNameAndEmailOrLastName('Jane', 'john.adam@xyz.com', 'Adams')
+	]).then(([ persons, person ]) => {
+		t.is(persons.length, 2)
 
-	t.is(persons.length, 2)
+		const lastNames = persons.map(person => person.last_name)
+		t.is(lastNames.includes('Adams'), true)
+		t.is(lastNames.includes('Quincy'), true)
 
-	const lastNames = persons.map(person => person.last_name)
-	t.is(lastNames.includes('Adams'), true)
-	t.is(lastNames.includes('Quincy'), true)
-
-	t.is(person.length, 1)
-	t.is(person[0].last_name, 'Adams')
+		t.is(person.length, 1)
+		t.is(person[0].last_name, 'Adams')
+	})
 })
 
-test('Using a beginning "or"', async t => {
+test('Using a beginning "or"', t => {
 	const personsQuery = Person.query()
 	personsQuery.where('email', 'john.adam@xyz.com')
 	personsQuery.finder.orFirstName('Jane')
 
-	const persons = await personsQuery
+	return personsQuery.then(persons => {
+		t.is(persons.length, 2)
 
-	t.is(persons.length, 2)
-
-	const lastNames = persons.map(person => person.last_name)
-	t.is(lastNames.includes('Adams'), true)
-	t.is(lastNames.includes('Quincy'), true)
+		const lastNames = persons.map(person => person.last_name)
+		t.is(lastNames.includes('Adams'), true)
+		t.is(lastNames.includes('Quincy'), true)
+	})
 })
 
-test('Find or fail', async t => {
+test('Find or fail', t => {
 	const personsQuery = Person.query().finder.firstNameOrFail('Jim')
 
-	try {
-		await personsQuery
-		t.fail()
-	} catch(err) {
-		t.is(err.message, 'NotFoundError')
-	}
+	return personsQuery.then(() => t.fail())
+		.catch(err => {
+			t.is(err.message, 'NotFoundError')
+		})
+
 })
 
-test('Querying on a non-existing field fails', async t => {
+test('Querying on a non-existing field fails', t => {
 
 	try {
-		await Person.query().finder.asdfead('Jane')
+		Person.query().finder.asdfead('Jane')
 		t.fail()
 	} catch(err) {
 		t.is(err.message, 'NotFoundError')
@@ -93,27 +94,29 @@ test('Querying on a non-existing field fails', async t => {
 	}
 })
 
-test('Continue chaining queries on top of finder', async t => {
-	const person = await Person.query().finder.firstName('Jane').where('last_name', 'Quincy').first()
-
-	t.is(person.first_name, 'Jane')
+test('Continue chaining queries on top of finder', t => {
+	return Person.query().finder.firstName('John').where('last_name', 'Adams').first().then(person => {
+		t.is(person.last_name, 'Adams')
+	})
 })
 
-test.before(async() => {
-	await db.schema.createTableIfNotExists('persons', table => {
+test.before(() => {
+	return db.schema.createTableIfNotExists('persons', table => {
 		table.increments('id').primary()
 		table.string('first_name')
 		table.string('last_name')
 		table.string('email')
+	}).then(() => {
+		return db('persons').delete()
+	}).then(() => {
+		return Promise.all([
+			Person.query().insert({ first_name: 'John', last_name: 'Smith', email: 'john.smith@xyz.com' }),
+			Person.query().insert({ first_name: 'John', last_name: 'Adams', email: 'john.adam@xyz.com' }),
+			Person.query().insert({ first_name: 'Jane', last_name: 'Quincy', email: 'jane@ccc.com' })
+		])
 	})
-
-	await db('persons').delete()
-	await Person.query().insert({ first_name: 'John', last_name: 'Smith', email: 'john.smith@xyz.com' })
-	await Person.query().insert({ first_name: 'John', last_name: 'Adams', email: 'john.adam@xyz.com' })
-	return Person.query().insert({ first_name: 'Jane', last_name: 'Quincy', email: 'jane@ccc.com' })
 })
 
-test.after(async() => {
-	await db.schema.dropTable('persons')
-	return db.destroy()
+test.after(() => {
+	return db.schema.dropTable('persons').then(() => db.destroy())
 })
