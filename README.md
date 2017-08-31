@@ -21,7 +21,7 @@ Person.query().finder.firstNameOrFail('Jane')
 // If no model is returned, throws an error (uses throwIfNotFound() in Objection > 0.8.1)
 
 Person.query().finder.firstNameAndNonExistingField('foo')
-// => NotFoundError 'Querying invalid field: non_existing_field'
+// => Error 'Querying invalid field: non_existing_field'
 // The query fields will be validated against Person model's jsonSchema, if it has one.
 
 Person.query().avg('income').finder.lastNameAndCountry('Smith', 'USA').where('age', '<', 30)
