@@ -1,6 +1,6 @@
 {
   "name": "objection-dynamic-finder",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Dynamic finders for Objection.js",
   "main": "index.js",
   "repository": {
