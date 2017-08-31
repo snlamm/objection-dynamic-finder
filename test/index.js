@@ -87,22 +87,25 @@ test('Find or fail. Stub Objection version < 0.8.1', t => {
 	Person.QueryBuilder.prototype.throwIfNotFound = null
 
 	const personsQuery = Person.query().finder.firstNameOrFail('Jim')
-	const personQuery = Person.query().finder.firstNameOrFail('Jim').first()
+	const updatePersonQuery = Person.query().finder.firstNameOrFail('Jim').update({ email: 'jim@abc.com' })
+	const successfulPersonsQuery = Person.query().finder.firstNameOrFail('John')
 
-	return personsQuery.then(() => {
-		Person.QueryBuilder.prototype.throwIfNotFound = throwIfNotFound
-		t.fail()
-	}).catch(err => {
-		t.is(err.message, 'No models found')
-	}).then(() => {
-		return personQuery.then(() => {
+	return successfulPersonsQuery.then(() => {
+		return personsQuery.then(() => {
 			Person.QueryBuilder.prototype.throwIfNotFound = throwIfNotFound
 			t.fail()
 		}).catch(err => {
-			Person.QueryBuilder.prototype.throwIfNotFound = throwIfNotFound
 			t.is(err.message, 'No models found')
+		}).then(() => {
+			return updatePersonQuery.then(() => {
+				Person.QueryBuilder.prototype.throwIfNotFound = throwIfNotFound
+				t.fail()
+			}).catch(err => {
+				Person.QueryBuilder.prototype.throwIfNotFound = throwIfNotFound
+				t.is(err.message, 'No models found')
+			})
 		})
-	})
+	}).catch(() => t.fail())
 })
 
 test('Querying on a non-existing field fails', t => {
