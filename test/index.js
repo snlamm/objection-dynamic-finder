@@ -30,14 +30,20 @@ class Person extends Finder(Model) {
 	}
 }
 
+test('Using normal QueryBuilder methods', t => {
+	return Person.query().where('first_name', 'John').then(persons => {
+		t.is(persons[0].first_name, 'John')
+	})
+})
+
 test('Using a single field', t => {
-	return Person.query().finder.firstName('John').then(persons => {
+	return Person.query().firstName('John').then(persons => {
 		t.is(persons[0].first_name, 'John')
 	})
 })
 
 test('Using multiple fields with "and"', t => {
-	return Person.query().finder.firstNameAndLastName('John', 'Smith').then(persons => {
+	return Person.query().firstNameAndLastName('John', 'Smith').then(persons => {
 		t.is(persons.length, 1)
 		t.is(persons[0].last_name, 'Smith')
 	})
@@ -45,8 +51,8 @@ test('Using multiple fields with "and"', t => {
 
 test('Using multiple fields with "or"', t => {
 	return Promise.all([
-		Person.query().finder.firstNameAndEmailOrLastName('Jane', 'jane@ccc.com', 'Adams'),
-		Person.query().finder.firstNameAndEmailOrLastName('Jane', 'john.adam@xyz.com', 'Adams')
+		Person.query().firstNameAndEmailOrLastName('Jane', 'jane@ccc.com', 'Adams'),
+		Person.query().firstNameAndEmailOrLastName('Jane', 'john.adam@xyz.com', 'Adams')
 	]).then(([ persons, person ]) => {
 		t.is(persons.length, 2)
 
@@ -61,8 +67,7 @@ test('Using multiple fields with "or"', t => {
 
 test('Using a beginning "or"', t => {
 	const personsQuery = Person.query()
-	personsQuery.where('email', 'john.adam@xyz.com')
-	personsQuery.finder.orFirstName('Jane')
+	personsQuery.where('email', 'john.adam@xyz.com').orFirstName('Jane')
 
 	return personsQuery.then(persons => {
 		t.is(persons.length, 2)
@@ -74,7 +79,7 @@ test('Using a beginning "or"', t => {
 })
 
 test('Find or fail', t => {
-	const personsQuery = Person.query().finder.firstNameOrFail('Jim')
+	const personsQuery = Person.query().firstNameOrFail('Jim')
 
 	return personsQuery.then(() => t.fail())
 		.catch(err => {
@@ -86,9 +91,9 @@ test('Find or fail. Stub Objection version < 0.8.1', t => {
 	const throwIfNotFound = Person.QueryBuilder.prototype.throwIfNotFound
 	Person.QueryBuilder.prototype.throwIfNotFound = null
 
-	const personsQuery = Person.query().finder.firstNameOrFail('Jim')
-	const updatePersonQuery = Person.query().finder.firstNameOrFail('Jim').update({ email: 'jim@abc.com' })
-	const successfulPersonsQuery = Person.query().finder.firstNameOrFail('John')
+	const personsQuery = Person.query().firstNameOrFail('Jim')
+	const updatePersonQuery = Person.query().firstNameOrFail('Jim').update({ email: 'jim@abc.com' })
+	const successfulPersonsQuery = Person.query().firstNameOrFail('John')
 
 	return successfulPersonsQuery.then(() => {
 		return personsQuery.then(() => {
@@ -108,17 +113,42 @@ test('Find or fail. Stub Objection version < 0.8.1', t => {
 	}).catch(() => t.fail())
 })
 
+test('Getting on a non-existing field return undefined', t => {
+	t.is(Person.query().wwhere, undefined)
+})
+
 test('Querying on a non-existing field fails', t => {
 	try {
-		Person.query().finder.asdfead('Jane')
+		Person.query().asdfead('Jane')
 		t.fail()
 	} catch(err) {
-		t.is(err.message, 'Querying invalid field: asdfead. Please fix the query or update the jsonSchema.')
+		t.is(err.name, 'TypeError')
+		t.is(err.message, 'Person.query(...).asdfead is not a function')
 	}
 })
 
+test('Using without a jsonSchema fails', t => {
+	const schema = Person.$$jsonSchema
+	Person.$$jsonSchema =  null
+
+	try {
+		Person.query().where('first_name', 'John').first()
+	} catch(err) {
+		Person.$$jsonSchema = schema
+		t.fail()
+	}
+
+	try {
+		Person.query().firstName('John').first()
+	} catch(err) {
+		t.is(err.message, 'Attempting to use dynamic finders without a jsonSchema. Please define it')
+	}
+
+	Person.$$jsonSchema = schema
+})
+
 test('Continue chaining queries on top of finder', t => {
-	return Person.query().finder.firstName('John').where('last_name', 'Adams').first().then(person => {
+	return Person.query().firstName('John').where('last_name', 'Adams').first().then(person => {
 		t.is(person.last_name, 'Adams')
 	})
 })
