@@ -80,17 +80,37 @@ test('Find or fail', t => {
 		.catch(err => {
 			t.is(err.message, 'NotFoundError')
 		})
+})
 
+test('Find or fail. Stub Objection version < 0.8.1', t => {
+	const throwIfNotFound = Person.QueryBuilder.prototype.throwIfNotFound
+	Person.QueryBuilder.prototype.throwIfNotFound = null
+
+	const personsQuery = Person.query().finder.firstNameOrFail('Jim')
+	const personQuery = Person.query().finder.firstNameOrFail('Jim').first()
+
+	return personsQuery.then(() => {
+		Person.QueryBuilder.prototype.throwIfNotFound = throwIfNotFound
+		t.fail()
+	}).catch(err => {
+		t.is(err.message, 'No models found')
+	}).then(() => {
+		return personQuery.then(() => {
+			Person.QueryBuilder.prototype.throwIfNotFound = throwIfNotFound
+			t.fail()
+		}).catch(err => {
+			Person.QueryBuilder.prototype.throwIfNotFound = throwIfNotFound
+			t.is(err.message, 'No models found')
+		})
+	})
 })
 
 test('Querying on a non-existing field fails', t => {
-
 	try {
 		Person.query().finder.asdfead('Jane')
 		t.fail()
 	} catch(err) {
-		t.is(err.message, 'NotFoundError')
-		t.is(err.data.trim(), 'Querying invalid field: asdfead. Please fix the query or update your jsonSchema.')
+		t.is(err.message.trim(), 'Querying invalid field: asdfead. Please fix the query or update your jsonSchema.')
 	}
 })
 

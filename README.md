@@ -18,7 +18,7 @@ Person.query().finder.isDisabledOrStatus(true, 'failed')
 // => Person.query().where('is_disabled', true).orWhere('status', 'failed')
 
 Person.query().finder.firstNameOrFail('Jane')
-// If no model is returned, throws a NotFoundError.
+// If no model is returned, throws an error (uses throwIfNotFound() in Objection > 0.8.1)
 
 Person.query().finder.firstNameAndNonExistingField('foo')
 // => NotFoundError 'Querying invalid field: non_existing_field'
@@ -29,7 +29,7 @@ Person.query().avg('income').finder.lastNameAndCountry('Smith', 'USA').where('ag
 ```
 
 ## Installation
-Due to [Babel not transpiling](http://babeljs.io/learn-es2015/#ecmascript-2015-features-proxies) the Proxy object, this plugin is only compatible with Node versions >= 6.0.0.
+Due to [Babel not handling](http://babeljs.io/learn-es2015/#ecmascript-2015-features-proxies) the Proxy object, this plugin is only compatible with Node versions >= 6.0.0.
 
 Add the `objection-dynamic-finder` package via your preferred package manager:
 

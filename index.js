@@ -16,7 +16,7 @@ module.exports = Model => {
 
 				// For queryStrings that end in 'OrFail', fail if no models are found ex. firstNameOrFail
 				if(queryString.slice(-6) === 'OrFail') {
-					this.throwIfNotFound()
+					this._failIfNotFound()
 					queryString = queryString.slice(0, -6)
 				}
 
@@ -45,7 +45,7 @@ module.exports = Model => {
 					// If a jsonSchema is defined on the model, use it to validate that the queried fields exist
 					if(hasSchema) {
 						if((schema.properties[searchField] === void 0) && (schema.properties[cameled] === void 0)) {
-							throw new Model.NotFoundError(`
+							throw new Error(`
 								Querying invalid field: ${searchField}. Please fix the query or update your jsonSchema.
 								`)
 						}
@@ -69,6 +69,24 @@ module.exports = Model => {
 			// Returns the proxy to allow accces to the getter
 			return proxy
 		}
+
+		// Use throwIfNotFound on Objection >= 0.8.1. Else mimic its basic functionality.
+		_failIfNotFound() {
+			if(typeof this.throwIfNotFound === 'function') {
+				return this.throwIfNotFound()
+			}
+
+			return this.runAfter(result => {
+				if(Array.isArray(result) && result.length === 0) {
+					throw new Error('No models found')
+				} else if([ null, undefined, 0 ].includes(result)) {
+					throw new Error('No models found')
+				}
+
+				return result
+			})
+		}
+
 	}
 
 	return class extends Model {
