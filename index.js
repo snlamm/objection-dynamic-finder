@@ -11,7 +11,7 @@ module.exports = Model => {
 				let whereTerm = 'where'
 				let offsetLetter = ''
 				let argCount = 0
-				const schema = this._modelClass.$$jsonSchema || this._modelClass.jsonSchema
+				const schema = this.modelClass().getJsonSchema()
 				const hasSchema = schema && schema.properties
 
 				// For queryStrings that end in 'OrFail', fail if no models are found ex. firstNameOrFail
