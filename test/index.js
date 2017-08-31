@@ -113,7 +113,7 @@ test('Querying on a non-existing field fails', t => {
 		Person.query().finder.asdfead('Jane')
 		t.fail()
 	} catch(err) {
-		t.is(err.message.trim(), 'Querying invalid field: asdfead. Please fix the query or update your jsonSchema.')
+		t.is(err.message, 'Querying invalid field: asdfead. Please fix the query or update the jsonSchema.')
 	}
 })
 

@@ -45,9 +45,9 @@ module.exports = Model => {
 					// If a jsonSchema is defined on the model, use it to validate that the queried fields exist
 					if(hasSchema) {
 						if((schema.properties[searchField] === void 0) && (schema.properties[cameled] === void 0)) {
-							throw new Error(`
-								Querying invalid field: ${searchField}. Please fix the query or update your jsonSchema.
-								`)
+							throw new Error(
+								`Querying invalid field: ${searchField}. Please fix the query or update the jsonSchema.`
+							)
 						}
 					}
 
