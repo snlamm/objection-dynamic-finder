@@ -11,20 +11,20 @@ An Objection.js plugin for using convenient finders inspired by Rails's [dynamic
 ## Examples
 
 ```js
-Person.query().finder.firstNameAndLastName('John', 'Smith')
+Person.query().firstNameAndLastName('John', 'Smith')
 // => Person.query().where('first_name', 'John').where('last_name', 'Smith')
 
-Person.query().finder.isDisabledOrStatus(true, 'failed')
+Person.query().isDisabledOrStatus(true, 'failed')
 // => Person.query().where('is_disabled', true).orWhere('status', 'failed')
 
-Person.query().finder.firstNameOrFail('Jane')
+Person.query().firstNameOrFail('Jane')
 // If no model is returned, throws an error (uses throwIfNotFound() in Objection > 0.8.1)
 
-Person.query().finder.firstNameAndNonExistingField('foo')
-// => Error 'Querying invalid field: non_existing_field'
-// The query fields will be validated against Person model's jsonSchema, if it has one.
+Person.query().firstNameAndNonExistingField('foo')
+// => TypeError 'Person.query(...).firstNameAndNonExistingField is not a function'
+// Uses the model's jsonSchema (required) for validation.
 
-Person.query().avg('income').finder.lastNameAndCountry('Smith', 'USA').where('age', '<', 30)
+Person.query().avg('income').lastNameAndCountry('Smith', 'USA').where('age', '<', 30)
 // Finders can be chained with all other QueryBuilder methods.
 ```
 
@@ -39,7 +39,7 @@ npm install --save objection-dynamic-finder
 
 ## Usage
 
-See Objection.js [docs](http://vincit.github.io/objection.js/#plugin-development-best-practices) on using plugins. Once the plugin is applied to a Model class, that class can use `.finder` in queries.
+See Objection.js [docs](http://vincit.github.io/objection.js/#plugin-development-best-practices) on using plugins. Once the plugin is applied to a Model class, that class can use dynamic finders in queries.
 
 ```js
 const Finder = require('objection-dynamic-finder')
@@ -53,7 +53,7 @@ class Person extends Finder(Model) {
 
 ## Validation Using jsonSchemas
 
-_If_ a class has a jsonSchema property defined then the fields in in the finder will be validated against the schema to make sure they exist on the model. Make sure the schema is up to date! CamelCase and snake_case property names are both supported.
+A class must have a jsonSchema property defined in order to use dynamic finders. They will throw an error otherwise. Make sure the schema is up to date! CamelCase and snake_case property names are both supported.
 
 ## Contributing
 Contributions are always welcome. You are encouraged to open issues and merge requests.

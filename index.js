@@ -2,6 +2,7 @@ module.exports = Model => {
 
 	class FinderQueryBuilder extends Model.QueryBuilder {
 
+		// Validate the query string against the jsonSchema and then parse it into 'where' statements
 		_buildDynamicFinder(queryString) {
 			const buildResults = {
 				shouldErrorOnFail: false,
@@ -47,13 +48,13 @@ module.exports = Model => {
 				const cameled = fullTerm[0].toLowerCase() + fullTerm.slice(1)
 				const searchField = cameled.replace(/(.)([A-Z])/, '$1_$2').toLowerCase()
 
-				// If a jsonSchema is defined on the model, use it to validate that the queried fields exist.
+				// Use the jsonSchema to validate that the queried fields exist
 				if((schema.properties[searchField] === void 0) && (schema.properties[cameled] === void 0)) {
 					buildResults.isFailedSchemaValidation = true
 					return buildResults
 				}
 
-				// Add the components for the where query
+				// Collect the components for the where query
 				buildResults.searchFields.push([ whereTerm, searchField ])
 			}
 
@@ -61,15 +62,15 @@ module.exports = Model => {
 		}
 
 		_doDynamicFinder(shouldErrorOnFail, searchFields, ...args) {
-			if(shouldErrorOnFail) {
-				this._failIfNotFound()
-			}
-
 			let argCount = 0
 
 			// Add the where() queries
 			for(const [ whereTerm, searchField ] of searchFields) {
 				this[whereTerm](searchField, args[argCount ++])
+			}
+
+			if(shouldErrorOnFail) {
+				this._failIfNotFound()
 			}
 
 			return this
@@ -102,6 +103,8 @@ module.exports = Model => {
 		static query(...args) {
 			const queryBuilder = super.query(...args)
 
+			// The proxy wraps QueryBuilder, adding a getter for query strings.
+			// If the string is not a key for an existing property, attempt to parse it into `where` statements
 			return new Proxy(queryBuilder, {
 				get: (target, propKey) => {
 					if(propKey in target) {
