@@ -104,7 +104,7 @@ module.exports = Model => {
 
 			return new Proxy(queryBuilder, {
 				get: (target, propKey) => {
-					if(target[propKey] !== void 0) {
+					if(propKey in target) {
 						return target[propKey]
 					}
 
