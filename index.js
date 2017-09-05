@@ -55,7 +55,7 @@ module.exports = Model => {
 					this[whereTerm](searchField, args[argCount ++])
 				}
 
-				// returns the QueryBuilder to support further query chaining
+				// Return the QueryBuilder to support further query chaining
 				return this
 			}, {
 				get: (object, prop) => {
@@ -66,7 +66,7 @@ module.exports = Model => {
 				}
 			})
 
-			// Returns the proxy to allow accces to the getter
+			// Return the proxy to allow accces to the getter
 			return proxy
 		}
 

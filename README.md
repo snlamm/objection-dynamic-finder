@@ -53,7 +53,7 @@ class Person extends Finder(Model) {
 
 ## Validation Using jsonSchemas
 
-_If_ a class has a jsonSchema property defined then the fields in in the finder will be validated against the schema to make sure they exist on the model. Make sure the schema is up to date! CamelCase and snake_case property names are both supported.
+_If_ a class has a jsonSchema property defined then the fields in the finder will be validated against the schema to make sure they exist on the model. Make sure the schema is up to date! CamelCase and snake_case property names are both supported.
 
 ## Contributing
 Contributions are always welcome. You are encouraged to open issues and merge requests.
