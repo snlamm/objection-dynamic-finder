@@ -117,37 +117,19 @@ test('Querying on a non-existing field fails', t => {
 	}
 })
 
-// Currently in sqlite, without jsonSchema validation, querying on an invalid field will not error.
-// This will change in the next version of knex, at which point I will update this test.
-test('Using without a jsonSchema will not throw errors in sqlite', t => {
+test('Querying on a non-existing field fails even without a jsonSchema', t => {
 	const schema = Person.$$jsonSchema
 	Person.$$jsonSchema =  null
 
 	return Person.query().finder.firstName('John').first().then(person => {
 		t.is(person.first_name, 'John')
 
-		let query = null
-
-		try {
-			query = Person.query().finder.ffffirstName('John').first()
-
-			// eslint-disable-next-line quotes
-			t.is(query.toString(), `select "persons".* from "persons" where "ffffirst_name" = 'John'`)
-		} catch(err) {
+		return Person.query().finder.ffffirstName('John').first().then(() => {
 			Person.$$jsonSchema = schema
-
 			t.fail()
-		}
-
-		return query.then(result => {
-			Person.$$jsonSchema = schema
-
-			t.is(result, undefined)
+		}).catch(err => {
+			t.is(err.message.includes('SQLITE_ERROR: no such column: ffffirst_name'), true)
 		})
-	}).catch(() => {
-		Person.$$jsonSchema = schema
-
-		t.fail()
 	})
 })
 
